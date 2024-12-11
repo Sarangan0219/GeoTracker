@@ -9,16 +9,19 @@ import java.util.Optional;
 public interface EventRepository {
     GeoFenceEvent saveGeoFenceEvent(GeoFenceEvent event);
 
+    List<List<GeoFenceEvent>> findEventsByVehicleId(String vehicleId);
+
     JourneyEvent saveJourneyEvent(JourneyEvent event);
 
-    List<JourneyEvent> findJourneyByVehicleId(String vehicleId);
+    JourneyEvent findActiveJourneyByVehicleId(String vehicleId);
+
+    List<List<JourneyEvent>> findJourneyHistory();
+    List<List<JourneyEvent>> findJourneyHistoryByVehicleId(String vehicleId);
 
     Optional<GeoFenceEvent> findActiveByVehicleId(String vehicleId);
 
-    List<GeoFenceEvent> findEventsVehicleId(String vehicleId);
+    List<GeoFenceEvent> findActiveEventsByVehicleId(String vehicleId);
 
     List<List<GeoFenceEvent>> findAll();
-
-    void deleteActiveByVehicleId(String vehicleId);
 }
 

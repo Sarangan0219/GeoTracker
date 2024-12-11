@@ -5,7 +5,6 @@ import com.geotracker.helper.eventHandler.*;
 import com.geotracker.model.GeoFence;
 import com.geotracker.model.GeoFenceEvent;
 import com.geotracker.model.VehiclePosition;
-import com.geotracker.model.JourneyEvent;
 import com.geotracker.repository.EventRepository;
 import com.geotracker.repository.GeoFenceRepository;
 import com.geotracker.strategy.GeoFenceValidationStrategyFactory;
@@ -109,20 +108,8 @@ public class EventService {
         return eventRepository.findAll();
     }
 
-    public List<GeoFenceEvent> getVehicleEventsHistory(String vehicleId) {
+    public List<List<GeoFenceEvent>> getGeoFenceEventsByVehicleId(String vehicleId) {
         log.info("Fetching events for vehicle with ID: {}", vehicleId);
-        return eventRepository.findEventsVehicleId(vehicleId);
-    }
-
-    public List<JourneyEvent> getVehicleJourneyHistory(String vehicleId) {
-        log.info("Fetching journey history for vehicle with ID: {}", vehicleId);
-        return eventRepository.findJourneyByVehicleId(vehicleId);
-    }
-
-    public void saveJourneyEvent(JourneyEvent journeyEvent) {
-        log.info("""
-                Saving journey event for vehicle {} starting at {}
-                """, journeyEvent.getVehicleId(), journeyEvent.getStartTime());
-        eventRepository.saveJourneyEvent(journeyEvent);
+        return eventRepository.findEventsByVehicleId(vehicleId);
     }
 }

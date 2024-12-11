@@ -90,4 +90,19 @@ public class VehicleService {
         vehicleRepository.deleteById(vehicleId);
         log.info("Deleted vehicle with ID: {}", vehicleId);
     }
+
+    public Vehicle fetchVehicle(String vehicleId) {
+        return vehicleRepository.findById(vehicleId)
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found: " + vehicleId));
+    }
+
+    public void activateVehicle(Vehicle vehicle) {
+        vehicle.setActive(true);
+        vehicleRepository.save(vehicle);
+    }
+
+    public void deactivateVehicle(Vehicle vehicle) {
+        vehicle.setActive(false);
+        vehicleRepository.save(vehicle);
+    }
 }

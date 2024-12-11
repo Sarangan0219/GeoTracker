@@ -2,18 +2,16 @@ package com.geotracker.service;
 
 import com.geotracker.exception.ResourceNotFoundException;
 import com.geotracker.helper.UUIDGenerator;
-import com.geotracker.helper.eventHandler.JourneyEndEventHandler;
-import com.geotracker.helper.eventHandler.JourneyStartEventHandler;
-import com.geotracker.model.GeoFenceEvent;
-import com.geotracker.model.JourneyEvent;
-import com.geotracker.model.Vehicle;
-import com.geotracker.model.VehiclePosition;
+import com.geotracker.model.*;
 import com.geotracker.model.request.VehiclePositionRequest;
+import com.geotracker.model.view.GeoFenceEventView;
+import com.geotracker.model.view.JourneyView;
 import com.geotracker.repository.VehicleRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -25,22 +23,91 @@ public class VehiclePositionService {
     private final VehicleRepository vehicleRepository;
     private final UUIDGenerator uuidGenerator;
     private final EventService eventService;
-    private final JourneyStartEventHandler journeyStartEventHandler;
-    private final JourneyEndEventHandler journeyEndEventHandler;
+    private final GeoFenceService geoFenceService;
+    private  final  VehicleService vehicleService;
+    private final JourneyService journeyService;
 
     /**
      * Starts a journey for a vehicle.
-     *
-     * @param vehicleId - The vehicle's ID to start the journey for.
-     * @return VehiclePosition - The vehicle's position after starting the journey.
      */
-    public VehiclePosition startJourney(String vehicleId) {
-        Vehicle vehicle = vehicleRepository.findById(vehicleId)
-                .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found: " + vehicleId));
+    public JourneyView startJourney(String vehicleId) {
+        Vehicle vehicle = vehicleService.fetchVehicle(vehicleId);
+        vehicleService.activateVehicle(vehicle);
+        VehiclePosition vehiclePosition = initializeVehiclePosition(vehicleId);
+        VehiclePosition savedVehiclePosition = saveVehiclePosition(vehiclePosition);
+        JourneyEvent journeyEvent = journeyService.handleJourneyStartEvent(vehiclePosition);
+        journeyService.saveJourneyEvent(journeyEvent);
+        log.info("Started journey for vehicle with ID: {}", vehicleId);
+        String message = String.format("Journey started for vehicle ID: %s at %s", journeyEvent.getVehicleId(), journeyEvent.getStartTime());
+        return JourneyView.fromEntity(journeyEvent, message, null);
+    }
 
-        vehicle.setActive(true);
-        vehicleRepository.save(vehicle);
+    /**
+     * Ends the journey for a vehicle.
+     */
+    public JourneyView endJourney(String vehicleId) {
+        Vehicle vehicle = vehicleService.fetchVehicle(vehicleId);
+        vehicleService.deactivateVehicle(vehicle);
 
+        VehiclePosition position = vehicleRepository.getPositionByVehicleID(vehicleId);
+
+        JourneyEvent startJourneyEvent = journeyService.findActiveJourneyByVehicleId(vehicleId)
+                .orElseThrow(() -> new ResourceNotFoundException("No active journey found for vehicle: " + vehicleId));
+
+        JourneyEvent endJourneyEvent = journeyService.handleJourneyEndEvent(position);
+        endJourneyEvent.setStartTime(startJourneyEvent.getStartTime());
+        endJourneyEvent.setGeoFencesCrossed(geoFenceService.findGeoFencesCrossed(vehicleId, endJourneyEvent));
+
+        Duration journeyDuration = journeyService.calculateJourneyDuration(endJourneyEvent);
+        String message = String.format("Journey ended for vehicle ID: %s at %s. Duration: %s seconds.",
+                vehicleId, endJourneyEvent.getEndTime(), journeyDuration.toSeconds());
+
+        journeyService.saveJourneyEvent(endJourneyEvent);
+        log.info("Ended journey for vehicle with ID: {}", vehicleId);
+
+        return JourneyView.fromEntity(endJourneyEvent, message, journeyDuration);
+    }
+
+    /**
+     * Processes a new vehicle position update.
+     */
+    public GeoFenceEventView processVehiclePosition(VehiclePositionRequest vehiclePositionRequest) {
+        String vehicleId = vehiclePositionRequest.vehicleId();
+        log.info("Processing vehicle position for vehicle ID: {}", vehicleId);
+
+        Vehicle vehicle = vehicleService.fetchVehicle(vehicleId);
+
+        if (!vehicle.isActive()) {
+            log.error("A journey is not started for this vehicle: {}", vehicleId);
+            throw new IllegalStateException("Vehicle journey not started");
+        }
+
+        VehiclePosition vehiclePosition = Optional.ofNullable(vehicleRepository.getPositionByVehicleID(vehicleId))
+                .map(existingPosition -> updateVehiclePosition(existingPosition, vehiclePositionRequest))
+                .orElseGet(() -> createNewVehiclePosition(vehiclePositionRequest));
+
+        vehiclePosition.setRecordedTimestamp(LocalDateTime.now());
+        GeoFenceEvent geoFenceEvent = eventService.handleVehiclePosition(vehiclePosition);
+        if(geoFenceEvent.getGeoFenceName() != null) {
+            String geoFenceId = geoFenceService.getGeoFenceByName(geoFenceEvent.getGeoFenceName()).geoFenceId();
+            vehiclePosition.setGeoFenceId(geoFenceId);
+            vehiclePosition.setWithinGeofence(true);
+        } else{
+            vehiclePosition.setWithinGeofence(false);
+        }
+        vehicleRepository.savePosition(vehiclePosition);
+        String message = geoFenceService.generateGeoFenceMessage(geoFenceEvent);
+        return GeoFenceEventView.fromEntity(
+                geoFenceEvent,
+                message,
+                geoFenceEvent.getDurationOfStay()
+        );
+    }
+
+    /**
+     * Initializes a new VehiclePosition object.
+     */
+    private VehiclePosition initializeVehiclePosition(String vehicleId) {
         VehiclePosition vehiclePosition = new VehiclePosition();
         vehiclePosition.setId(uuidGenerator.get());
         vehiclePosition.setVehicleId(vehicleId);
@@ -48,68 +115,14 @@ public class VehiclePositionService {
         vehiclePosition.setLatitude(0.0);
         vehiclePosition.setLongitude(0.0);
         vehiclePosition.setRecordedTimestamp(LocalDateTime.now());
-
-        VehiclePosition savedVehiclePosition = vehicleRepository.savePosition(vehiclePosition);
-
-        // Handle journey start event
-        JourneyEvent journeyEvent = journeyStartEventHandler.handleEvent(vehiclePosition, vehiclePosition.getRecordedTimestamp());
-        eventService.saveJourneyEvent(journeyEvent);
-        log.info("Started journey for vehicle with ID: {}", vehicleId);
-
-        return savedVehiclePosition;
+        return vehiclePosition;
     }
 
     /**
-     * Ends the journey for a vehicle.
-     *
-     * @param vehicleId - The vehicle's ID to end the journey for.
-     * @return VehiclePosition - The final position of the vehicle at the end of the journey.
+     * Saves the VehiclePosition to the repository.
      */
-    public VehiclePosition endJourney(String vehicleId) {
-        Vehicle vehicle = vehicleRepository.findById(vehicleId)
-                .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found: " + vehicleId));
-
-        vehicle.setActive(false);
-        vehicleRepository.save(vehicle);
-
-        VehiclePosition position = vehicleRepository.getPositionByVehicleID(vehicleId);
-
-        // Handle journey end event
-        JourneyEvent journeyEvent = journeyEndEventHandler.handleEvent(position, position.getRecordedTimestamp());
-        eventService.saveJourneyEvent(journeyEvent);
-        log.info("Ended journey for vehicle with ID: {}", vehicleId);
-
-        return position;
-    }
-
-    /**
-     * Processes a new vehicle position update.
-     *
-     * @param vehiclePositionRequest - The request body containing new vehicle position details.
-     * @return GeoFenceEvent - The processed geo-fence event based on the vehicle's position.
-     */
-    public GeoFenceEvent processVehiclePosition(VehiclePositionRequest vehiclePositionRequest) {
-        String vehicleId = vehiclePositionRequest.vehicleId();
-        log.info("Processing vehicle position for vehicle ID: {}", vehicleId);
-
-        Vehicle vehicle = vehicleRepository.findById(vehicleId)
-                .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found: " + vehicleId));
-
-        if (!vehicle.isActive()) {
-            log.error("A journey is not started for this vehicle: {}", vehicleId);
-            throw new IllegalStateException("Vehicle journey not started");
-        }
-
-        // Update or create a new position
-        VehiclePosition vehiclePosition = Optional.ofNullable(vehicleRepository.getPositionByVehicleID(vehicleId))
-                .map(existingPosition -> updateVehiclePosition(existingPosition, vehiclePositionRequest))
-                .orElseGet(() -> createNewVehiclePosition(vehiclePositionRequest));
-
-        vehiclePosition.setRecordedTimestamp(LocalDateTime.now());
-        vehicleRepository.savePosition(vehiclePosition);
-
-        // Generate GeoFenceEvent based on vehicle position
-        return eventService.handleVehiclePosition(vehiclePosition);
+    private VehiclePosition saveVehiclePosition(VehiclePosition vehiclePosition) {
+        return vehicleRepository.savePosition(vehiclePosition);
     }
 
     private VehiclePosition updateVehiclePosition(VehiclePosition existingPosition, VehiclePositionRequest request) {

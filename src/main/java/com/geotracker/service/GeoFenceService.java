@@ -5,6 +5,8 @@ import com.geotracker.exception.ValidationException;
 import com.geotracker.helper.GeoFenceUtils;
 import com.geotracker.helper.UUIDGenerator;
 import com.geotracker.model.GeoFence;
+import com.geotracker.model.GeoFenceEvent;
+import com.geotracker.model.JourneyEvent;
 import com.geotracker.model.request.GeoFenceRequest;
 import com.geotracker.model.view.GeoFenceView;
 import com.geotracker.repository.GeoFenceRepository;
@@ -12,8 +14,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -21,6 +25,7 @@ import java.util.Set;
 public class GeoFenceService {
 
     private final GeoFenceRepository geoFenceRepository;
+    private final EventService eventService;
     private final UUIDGenerator uuidGenerator;
     private final VehicleService vehicleService;
 
@@ -182,5 +187,54 @@ public class GeoFenceService {
 
         geoFenceRepository.deleteByName(name);
         log.info("Deleted geofence: {}", geoFence);
+    }
+
+    public Set<String> findGeoFencesCrossed(String vehicleId, JourneyEvent endJourneyEvent) {
+        List<List<GeoFenceEvent>> geoFenceEvents = eventService.getGeoFenceEventsByVehicleId(vehicleId);
+        return geoFenceEvents.stream()
+                .flatMap(List::stream)
+                .filter(geoFenceEvent -> isGeoFenceWithinJourneyTime(geoFenceEvent, endJourneyEvent))
+                .map(GeoFenceEvent::getGeoFenceName)
+                .collect(Collectors.toSet());
+    }
+
+    private boolean isGeoFenceWithinJourneyTime(GeoFenceEvent geoFenceEvent, JourneyEvent journeyEvent) {
+        return geoFenceEvent.getEntryTime() != null &&
+                geoFenceEvent.getEntryTime().isAfter(journeyEvent.getStartTime()) &&
+                geoFenceEvent.getExitTime() != null &&
+                geoFenceEvent.getExitTime().isBefore(journeyEvent.getEndTime());
+    }
+
+    public String generateGeoFenceMessage(GeoFenceEvent geoFenceEvent) {
+        if (geoFenceEvent.getEntryTime() != null && geoFenceEvent.getExitTime() != null) {
+            return String.format(
+                    "Vehicle ID %s entered geo-fence '%s' at %s and exited at %s. Duration of stay: %s minutes.",
+                    geoFenceEvent.getVehicleId(),
+                    geoFenceEvent.getGeoFenceName(),
+                    geoFenceEvent.getEntryTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                    geoFenceEvent.getExitTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                    geoFenceEvent.getDurationOfStay() != null ? geoFenceEvent.getDurationOfStay().toMinutes() : "N/A"
+            );
+        } else if (geoFenceEvent.getEntryTime() != null) {
+            return String.format(
+                    "Vehicle ID %s entered geo-fence '%s' at %s. Exit time is not recorded yet.",
+                    geoFenceEvent.getVehicleId(),
+                    geoFenceEvent.getGeoFenceName(),
+                    geoFenceEvent.getEntryTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+            );
+        } else if (geoFenceEvent.getExitTime() != null) {
+            return String.format(
+                    "Vehicle ID %s exited geo-fence '%s' at %s. Entry time is not recorded.",
+                    geoFenceEvent.getVehicleId(),
+                    geoFenceEvent.getGeoFenceName(),
+                    geoFenceEvent.getExitTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+            );
+        } else {
+            return String.format(
+                    "Geo-fence event recorded for vehicle ID %s in geo-fence '%s', but both entry and exit times are missing.",
+                    geoFenceEvent.getVehicleId(),
+                    geoFenceEvent.getGeoFenceName()
+            );
+        }
     }
 }

@@ -40,7 +40,7 @@ public class AuthenticationController {
         if (authenticationResponse != null) {
             return ResponseEntity.ok(authenticationResponse);
         } else {
-            log.warn("Registration failed for username: {}", request.getUsername());
+            log.error("Registration failed for username: {}", request.getUsername());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Registration failed as " + request.getUsername() + " already exists");
         }

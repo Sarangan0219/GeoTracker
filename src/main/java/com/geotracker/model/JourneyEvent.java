@@ -18,5 +18,5 @@ public class JourneyEvent {
     private String vehicleId;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
-    private Set<GeoFence> geoFencesCrossed;
+    private Set<String> geoFencesCrossed;
 }

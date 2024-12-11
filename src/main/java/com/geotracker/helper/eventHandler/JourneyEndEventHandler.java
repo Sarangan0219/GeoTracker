@@ -22,7 +22,7 @@ public class JourneyEndEventHandler extends EventHandler<JourneyEvent> {
                 .id(generateEventId()) // Generate a new event ID
                 .vehicleId(position.getVehicleId())
                 .startTime(startTime)
-                .endTime(position.getRecordedTimestamp()) // End time is the current time when journey ends
+                .endTime(LocalDateTime.now()) // End time is the current time when journey ends
                 .build();
     }
 }
