@@ -17,12 +17,11 @@ public class JourneyEndEventHandler extends EventHandler<JourneyEvent> {
 
     @Override
     public JourneyEvent handleEvent(VehiclePosition position, GeoFence geoFence, boolean isAuthorized, LocalDateTime startTime) {
-        // Handle the journey end event
         return JourneyEvent.builder()
-                .id(generateEventId()) // Generate a new event ID
+                .id(generateEventId())
                 .vehicleId(position.getVehicleId())
                 .startTime(startTime)
-                .endTime(LocalDateTime.now()) // End time is the current time when journey ends
+                .endTime(LocalDateTime.now())
                 .build();
     }
 }
