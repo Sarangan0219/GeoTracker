@@ -1,0 +1,704 @@
+{
+	"info": {
+		"_postman_id": "450f1682-4b83-4cd2-85c3-f06ab3910d24",
+		"name": "GeoTracker",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "11475432"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\" : \"admin1@gmail.com\",\n    \"password\" : \"sarangan\",\n    \"role\" : \"ADMIN\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/auth/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\" : \"admin1@gmail.com\",\n    \"password\" : \"sarangan\",\n    \"role\" : \"ADMIN\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Vehicle",
+			"item": [
+				{
+					"name": "Add Vehicle",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBnbWFpbC5jb20iLCJpYXQiOjE3MzM4NjY5ODMsImV4cCI6MTczMzk1MzM4M30.CpPW6IKBMAT5vccp0X33obXhVargRIZCIUCQKBRPYBw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"make\": \"Honda\",\n  \"model\" : \"Civic\",\n  \"description\": \"This is a Honda vehicle\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/vehicles",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"vehicles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update vehicle",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBnbWFpbC5jb20iLCJpYXQiOjE3MzM4NjY5ODMsImV4cCI6MTczMzk1MzM4M30.CpPW6IKBMAT5vccp0X33obXhVargRIZCIUCQKBRPYBw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"make\": \"Honda\",\n    \"model\": \"Civic\",\n    \"description\": \"This is a test vehicle new\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/vehicles/VEH-9e366ebb-102b-4072-841d-d54a18340f75",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"vehicles",
+								"VEH-9e366ebb-102b-4072-841d-d54a18340f75"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Vehicle",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBnbWFpbC5jb20iLCJpYXQiOjE3MzM4NjY5ODMsImV4cCI6MTczMzk1MzM4M30.CpPW6IKBMAT5vccp0X33obXhVargRIZCIUCQKBRPYBw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"vehicleId\": 1,\n  \"name\": \"Vehicle A\",\n  \"description\": \"This is a test vehicle\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/vehicles/VEH-9e366ebb-102b-4072-841d-d54a18340f75",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"vehicles",
+								"VEH-9e366ebb-102b-4072-841d-d54a18340f75"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Vehicles",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBnbWFpbC5jb20iLCJpYXQiOjE3MzM4NjY5ODMsImV4cCI6MTczMzk1MzM4M30.CpPW6IKBMAT5vccp0X33obXhVargRIZCIUCQKBRPYBw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"vehicleId\": 1,\n  \"name\": \"Vehicle A\",\n  \"description\": \"This is a test vehicle\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/vehicles",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"vehicles"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Geo Fences",
+			"item": [
+				{
+					"name": "Add Geo fences",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBnbWFpbC5jb20iLCJpYXQiOjE3MzM4NjY5ODMsImV4cCI6MTczMzk1MzM4M30.CpPW6IKBMAT5vccp0X33obXhVargRIZCIUCQKBRPYBw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Geofence 1\",\n  \"polygonCoordinates\": [\"(1.0, 1.0)\", \"(1.0, 2.0)\", \"(2.0, 2.0)\", \"(2.0, 1.0)\"],\n  \"authorizedVehicleIds\": [\"VEH-9e366ebb-102b-4072-841d-d54a18340f75\"]\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/geofences",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"geofences"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Geofences",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbjFAZ21haWwuY29tIiwiaWF0IjoxNzMzNjkxNjAwLCJleHAiOjE3MzM3NzgwMDB9.V0Tnp0oh4DXp3vzdkVHXAteLI6s00cHULiwhgU0Vnzc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": \"GEO-1ee414c1-d68a-4bff-9b74-8714c7f86a72\",\n  \"name\": \"Geofence 1\",\n  \"polygonCoordinates\": [\"(1.0,1.0)\", \"(1.0,2.0)\", \"(2.0,2.0)\", \"(2.0,1.0)\"],\n  \"authorizedVehicleIds\": [\"1\", \"2\", \"3\"],\n  \"validationStrategy\": \"STRICT\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/geofences",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"geofences"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get GeoFence by Name",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbjFAZ21haWwuY29tIiwiaWF0IjoxNzMzNjkxNjAwLCJleHAiOjE3MzM3NzgwMDB9.V0Tnp0oh4DXp3vzdkVHXAteLI6s00cHULiwhgU0Vnzc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": 1,\n  \"name\": \"Geofence 1\",\n  \"polygonCoordinates\": [\"(1.0,1.0)\", \"(1.0,2.0)\", \"(2.0,2.0)\", \"(2.0,1.0)\"],\n  \"authorizedVehicleIds\": [\"1\", \"2\", \"3\"],\n  \"validationStrategy\": \"STRICT\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/geoFences/Geofence 1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"geoFences",
+								"Geofence 1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get GeoFence by ID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbjFAZ21haWwuY29tIiwiaWF0IjoxNzMzODQ1MzAyLCJleHAiOjE3MzM5MzE3MDJ9._MTjWTmEpQd4HTQOaO0b_vyuAMegajEFr02eIT4Pcw4",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": 1,\n  \"name\": \"Geofence 1\",\n  \"polygonCoordinates\": [\"(1.0,1.0)\", \"(1.0,2.0)\", \"(2.0,2.0)\", \"(2.0,1.0)\"],\n  \"authorizedVehicleIds\": [\"1\", \"2\", \"3\"],\n  \"validationStrategy\": \"STRICT\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/geoFence/GEO-6206c410-9e61-40f9-991c-298f224dba0d",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"geoFence",
+								"GEO-6206c410-9e61-40f9-991c-298f224dba0d"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Vehicle Position",
+			"item": [
+				{
+					"name": "Start Journey",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbjFAZ21haWwuY29tIiwiaWF0IjoxNzMzODU1NzE3LCJleHAiOjE3MzM5NDIxMTd9.OD3rWQd_XpFH_Bpuy4AkFO1FGDPePaywNqwclEDBTEc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/vehicle-positions/VEH-5ca57d94-0594-4a60-b610-88604667dbec/journeys/start",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"vehicle-positions",
+								"VEH-5ca57d94-0594-4a60-b610-88604667dbec",
+								"journeys",
+								"start"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Vehicle Position",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbjFAZ21haWwuY29tIiwiaWF0IjoxNzMzODU1NzE3LCJleHAiOjE3MzM5NDIxMTd9.OD3rWQd_XpFH_Bpuy4AkFO1FGDPePaywNqwclEDBTEc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"vehicleId\": \"VEH-5ca57d94-0594-4a60-b610-88604667dbec\",\n  \"latitude\": \"1.5\",\n  \"longitude\": \"1.5\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/vehicle-positions",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"vehicle-positions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "End Journey",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBnbWFpbC5jb20iLCJpYXQiOjE3MzM4NTkwMjcsImV4cCI6MTczMzk0NTQyN30.BSoHryW_3sjxPFYWfxZW-YhURRWYWMzu0_c5D-1IRPY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/vehicle-positions/VEH-c8853d01-bbaa-4bf5-9e78-b5acb1f39bc4/journeys/end",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"vehicle-positions",
+								"VEH-c8853d01-bbaa-4bf5-9e78-b5acb1f39bc4",
+								"journeys",
+								"end"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Events",
+			"item": [
+				{
+					"name": "Get Event History",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBnbWFpbC5jb20iLCJpYXQiOjE3MzM5MDgwMDYsImV4cCI6MTczMzk5NDQwNn0.-aj2hNWxihGoo9H12q4y-xhO630ErrHUF6i734wypBg",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/events/history",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"events",
+								"history"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Events for a Vehicle",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBnbWFpbC5jb20iLCJpYXQiOjE3MzM4NTkwMjcsImV4cCI6MTczMzk0NTQyN30.BSoHryW_3sjxPFYWfxZW-YhURRWYWMzu0_c5D-1IRPY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/vehicle-positions/events/VEH-c8853d01-bbaa-4bf5-9e78-b5acb1f39bc4",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"vehicle-positions",
+								"events",
+								"VEH-c8853d01-bbaa-4bf5-9e78-b5acb1f39bc4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Journey History",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBnbWFpbC5jb20iLCJpYXQiOjE3MzM5MjExODEsImV4cCI6MTczNDAwNzU4MX0.5Cy38JpJI37mdUdF-GA7QRalfV4FR_qjTd5SEHFWVRc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/events/journey/history",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"events",
+								"journey",
+								"history"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Journey for a vehicle",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBnbWFpbC5jb20iLCJpYXQiOjE3MzM5MjExODEsImV4cCI6MTczNDAwNzU4MX0.5Cy38JpJI37mdUdF-GA7QRalfV4FR_qjTd5SEHFWVRc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/events/journey/history",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"events",
+								"journey",
+								"history"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbjFAZ21haWwuY29tIiwiaWF0IjoxNzMzODU2MjI4LCJleHAiOjE3MzM5NDI2Mjh9.yYoFbUVdNhSLKxw5eCKN3Bq4Ey_VXgVE6_6wal4sf6I",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
